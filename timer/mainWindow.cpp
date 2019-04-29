@@ -8,8 +8,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     cmd = new QProcess(this);
-    connect(cmd, SIGNAL(readyReadStandardOutput()),this,SLOT(on_readoutput()));
-    connect(cmd,SIGNAL(readyReadStandardOutput()),this, SLOT(on_readoutput()));
+    connect(cmd, SIGNAL(readyReadStandardOutput()),this,SLOT(on_readoutput())); //一旦有了前面的信号，就去执行槽的规定
+    connect(cmd,SIGNAL(readyReadStandardError()),this, SLOT(on_readoutput()));
 
     cmd->start("bash");
     cmd->waitForStarted();
@@ -28,7 +28,7 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::on_readoutput(){
-    ui->textEdit->append(cmd->readAllStandardOutput().data());
+    ui->textEdit->append(cmd->readAllStandardOutput().data()); //什么才算standardoutput？
 }
 
 void MainWindow::on_readerror(){
@@ -37,9 +37,8 @@ void MainWindow::on_readerror(){
 
 void MainWindow::on_middleware_clicked()
 {
-    ui->textEdit->clear();
-    cmd->write("/home/leo/OpenDDS-3.13.2/bin/DCPSInfoRepo"
-               "-ORBEndpoint iiop://localhost:12345\n"); //一定要加\n!
+    //cmd->write("~/OpenDDS-3.13.2/bin/DCPSInfoRepo -ORBEndpoint iiop://localhost:12345 &\n");
+    cmd->write("~/OpenDDS-3.13.2/bin/DCPSInfoRepo -o repo.ior &\n");
     ui->textEdit->append("DCPSInfoRepo starts.");
 }
 
@@ -47,14 +46,15 @@ void MainWindow::on_middleware_clicked()
 void MainWindow::on_timer_clicked()
 {
     ui->textEdit->clear();
-    cmd->write("/home/leo/OpenDDS-3.13.2/Timer/publisher"); //DCPSInforepo启动会不会阻塞publisher？这里用的是一个cmd？改用start会不会就能解决？
+    cmd->write("/home/leo/OpenDDS-3.13.2/Timer/publisher -DCPSINforepo file://repo.ior &\n"); //DCPSInforepo启动会不会阻塞publisher？这里用的是一个cmd？改用start会不会就能解决？
     ui->textEdit->append("Timer starts.");
 }
 
 void MainWindow::on_subscriber_clicked()
 {
     ui->textEdit->clear();
-    cmd->write("/home/leo/OpenDDS-3.13.2/Timer/subscriber");
+    cmd->write("/home/leo/OpenDDS-3.13.2/Timer/subscriber -DCPSINforepo file://repo.ior\n");
     ui->textEdit->append("Accepted.");
-
 }
+
+
