@@ -33,3 +33,4 @@ function analysis(){
 
        done
 }
+# while无限循环第一次就会退出
