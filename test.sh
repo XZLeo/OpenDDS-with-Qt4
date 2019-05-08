@@ -7,7 +7,7 @@ function analysis(){
     packloss=0;
     while :; do 
         ping -c1 -w2 8.8.8.8 | grep "packets" | awk -F, \
-		'{array=(${$3// / })}' #用\换行，还记得awk需要空格，\后面连注释都不能有
+		'{print $3}' #用\换行，还记得awk需要空格，\后面连注释都不能有
 :<<EOF
 	# 根据上面packloss的值打印和返回值
         if [ "$?" == 0 ]; then
